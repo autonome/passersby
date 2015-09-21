@@ -1,0 +1,46 @@
+html, body {
+  margin: 0;
+  padding: 0.5rem;
+}
+
+body {
+  font-size: 1rem;
+  background: #fff;
+}
+
+section {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  margin: 0 0 1rem 0;
+  font-size: 20rem;
+}
+
+p {
+  font-size: inherit;
+}
+
+#qrcode {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+}
+
+#vid {
+  position: absolute;
+  top: 200px;
+  left: 200px;
+  border: 1px solid green;
+  display: none;
+}
+
+.player {
+  height: 200px;
+  width: 200px;
+}
+
+#canvas {
+  display: none;
+}
