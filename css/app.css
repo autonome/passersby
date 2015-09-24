@@ -9,8 +9,9 @@ html, body {
 
 body {
   font-size: 1rem;
-  background: #fff;
+  background-color: rebeccapurple;
   font-family: 'Fira Sans';
+  color: white;
   display: flex;
 }
 
@@ -22,7 +23,8 @@ section {
 h1 {
   margin: 0 0 1rem 0;
   font-size: 8rem;
-  font-weight: 100;
+  font-weight: bold;
+  color: yellow;
 }
 
 #app_title {
@@ -32,12 +34,14 @@ h1 {
 p {
   font-size: inherit;
 }
-
+ 
+  
 #qrcode-container {
   position: absolute;
   bottom: 1rem;
   right: 2rem;
-
+  padding: 2rem;
+  color: black;
   width: var(--default-size);
   height: var(--default-size);
   background-color: silver;
