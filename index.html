@@ -2,8 +2,8 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>TV Fuck Yeah</title>
-        <meta name="description" content="A privileged app stub">
+        <title>Passersby</title>
+        <meta name="description" content="Interactive Web app to demonstrate the Firefox OS TV">
 
         <!--
           viewport allows you to control how mobile browsers will render your content.
@@ -41,14 +41,32 @@
         <script type="text/javascript" src="js/libs/qrcode.js" ></script>
         <script type="text/javascript" src="js/libs/qcode-decoder.min.js" ></script>
         <link rel="stylesheet" href="css/animate.css">
+        <link rel="stylesheet" href="css/fira/fira.css">
     </head>
     <body>
-        <section>
-            <h1 data-l10n-id="app_title">Stop and say hiiiiiii</h1>
-            <p data-l10n-id="app_description"></p>
-            <p id="message"></p>
-        </section>
-      <div id="qrcode"></div>
+      <section>
+        <h1 id="app_title" data-l10n-id="app_title"></h1>
+        <p data-l10n-id="app_description"></p>
+      </section>
+
+      <div id="qrcode-container">
+        <div id="qrcode-msg" data-l10n-id="qrcode_msg">Scan me to join!</div>
+        <div id="qrcode"></div>
+      </div>
+
+      <div id="instructions">
+        <ul>
+          <li>Open Firefox Developer Edition
+          <li>Tools -&gt; WebIDE
+          <li>Click "Remote Runtime"
+          <li>Enter "192.168.2.136:52222"
+        </ul>
+      </div>
+
+      <div id="start" data-l10n-id="start_msg" class="button hidden">Click to join!</div>
+      <div id="snap" data-l10n-id="snap_msg" class="button">Click to take snapshot!</div>
+
+      <!-- les invisibles -->
       <video id="vid"></video>
       <canvas id="canvas"></canvas>
     </body>

@@ -1,43 +1,55 @@
-// DOMContentLoaded is fired once the document has been loaded and parsed,
-// but without waiting for other external resources to load (css/images/etc)
-// That makes the app more responsive and perceived as faster.
-// https://developer.mozilla.org/Web/Reference/Events/DOMContentLoaded
+'use strict';
+
 window.addEventListener('DOMContentLoaded', function() {
 
-  // We'll ask the browser to use strict code to help us catch errors earlier.
-  // https://developer.mozilla.org/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
-  'use strict';
-
+  /*
   var translate = navigator.mozL10n.get;
+  navigator.mozL10n.once(function start() {
+  })
+  */
 
-  // We want to wait until the localisations library has loaded all the strings.
-  // So we'll tell it to let us know once it's ready.
-  navigator.mozL10n.once(start);
-
-  // ---
-
-  function start() {
-    // We're using textContent because inserting content from external sources into your page using innerHTML can be dangerous.
-    // https://developer.mozilla.org/Web/API/Element.innerHTML#Security_considerations
-    var message = document.getElementById('message');
-    message.textContent = translate('message');
+  function classify(selector, classesToAdd, classesToRemove) {
+    var els = document.querySelectorAll(selector)
+    //console.log('matches for', selector, els.length, 'adding:', classesToAdd, 'removing:', classesToRemove)
+    for (var i = 0; i < els.length; i++) {
+      if (classesToAdd)
+        classesToAdd.forEach(function(c) { els[i].classList.add(c) })
+      if (classesToRemove)
+        classesToAdd.forEach(function(c) { els[i].classList.add(c) })
+    }
   }
 
   var socket = io.connect('http://metafluff.com:9001'),
-      playerId = 'Player-' + Date.now()
+      playerId = navigator.mediaDevices ? 'Player-' + Date.now() : null,
+      gStream = null // FIXME
 
-  if (navigator.mediaDevices) {
-    socket.emit('player', {
-      player: {
-        id: playerId
-      }
-    })
-    startRecording()
+  if (playerId) {
+    classify('#start', ['animated', 'fadeIn', 'visible'])
+    classify('#qrcode-container', ['hidden'])
+    classify('#instructions', ['hidden'])
+    classify('#app_title', ['hidden'])
+
+    var start = document.querySelector('#start')
+    start.onclick = function() {
+      var vid = document.querySelector('#vid')
+      vid.style.display = 'block'
+      startRecording()
+    }
+
+    var snap = document.querySelector('#snap')
+    snap.onclick = takePicture
+  }
+  else {
+    // start webserver
+    //startListen()
+
+    classify('#start', ['hidden'])
+    classify('#snap', ['hidden'])
   }
 
+
   socket.on('player', function (data) {
-    //if (data.player.id != playerId)
-      addPlayerElement(data.player)
+    addPlayerElement(data.player)
   })
 
   var qrcode = new QRCode('qrcode', {
@@ -49,9 +61,11 @@ window.addEventListener('DOMContentLoaded', function() {
     correctLevel : QRCode.CorrectLevel.H
   });
 
-  function getRandomCoordinates() {
+  function getRandomCoordinates(container) {
     var fullWidth = window.innerWidth;
     var fullHeight = window.innerHeight;
+    //var fullWidth = container ? container.width : window.innerWidth;
+    //var fullHeight = container ? container.height : window.innerHeight;
     return {
       x: Math.round(Math.random() * fullWidth) + "px",
       y: Math.round(Math.random() * fullHeight) + "px"
@@ -69,8 +83,8 @@ window.addEventListener('DOMContentLoaded', function() {
       var coords = getRandomCoordinates()
       el.style.left = coords.x
       el.style.top = coords.y
-      el.style.backgroundColor = 'pink'
-      el.classList.add('player', 'animated', 'bounceInUp')
+      el.style.backgroundColor = 'orange'
+      el.classList.add('player', 'animated', 'bounceIn')
     }
     if (player.photoURL)
       el.style.background = 'url(' + player.photoURL + ')'
@@ -78,19 +92,19 @@ window.addEventListener('DOMContentLoaded', function() {
 
   function startRecording() {
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+      gStream = stream
       var vidEl = document.querySelector('#vid')
       vidEl.src = window.URL.createObjectURL(stream)
       vidEl.play()
+      /*
       vidEl.onloadedmetadata = function(e) {
-        /*
         var qrdc = new QCodeDecoder()
         qrdc.decodeFromVideo(vidEl, function (err) {
           if (err) throw err;
           alert(result);
         })
-        */
-        setInterval(takePicture, 1000)
       }
+      */
     })
     .catch(function(err) {
       console.log(err.name + ": " + err.message);
@@ -106,11 +120,15 @@ window.addEventListener('DOMContentLoaded', function() {
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
-      context.drawImage(vid, 0, 0, width, height);
+      context.drawImage(video, 0, 0, width, height);
     
+      gStream.stop()
+      video.style.display = 'none'
+
       var data = canvas.toDataURL('image/png');
-      //photo.setAttribute('src', data);
-      // update photo
+      canvas.style.display = 'block'
+
+      // send photo to server
       socket.emit('player', {
         player: {
           id: playerId,
@@ -118,8 +136,27 @@ window.addEventListener('DOMContentLoaded', function() {
         }
       })
     } else {
-      clearphoto();
+      // TODO
     }
   }
-
 });
+
+function startListen(){
+  console.log("Initializing server");
+  var socketServer = navigator.mozTCPSocket.listen(8008);
+
+  socketServer.onconnect = function(conn){
+    console.log("connected", conn);
+    conn.send("Ok. Got client on: ", conn.port);
+    conn.ondata = function(ev){
+      console.log("Got request: ", ev);   
+    };
+    conn.onclose = function(ev){
+      console.log("Client left:", ev);
+    }
+    conn.close();
+  }
+  socketServer.onerror = function(ev){
+    console.log("Failed to start: ", ev);
+  }
+}

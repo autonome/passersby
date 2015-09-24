@@ -1,3 +1,7 @@
+:root {
+  --default-size: 10rem;
+}
+
 html, body {
   margin: 0;
   padding: 0.5rem;
@@ -6,6 +10,8 @@ html, body {
 body {
   font-size: 1rem;
   background: #fff;
+  font-family: 'Fira Sans';
+  display: flex;
 }
 
 section {
@@ -15,32 +21,73 @@ section {
 
 h1 {
   margin: 0 0 1rem 0;
-  font-size: 20rem;
+  font-size: 8rem;
+  font-weight: 100;
+}
+
+#app_title {
+  width: 20rem;
 }
 
 p {
   font-size: inherit;
 }
 
-#qrcode {
+#qrcode-container {
   position: absolute;
   bottom: 1rem;
-  left: 1rem;
+  right: 2rem;
+
+  width: var(--default-size);
+  height: var(--default-size);
+  background-color: silver;
+
+  justify-content:center;
+  align-items:center;
 }
 
 #vid {
   position: absolute;
-  top: 200px;
-  left: 200px;
-  border: 1px solid green;
-  display: none;
+  width: var(--default-size);
+  height: var(--default-size);
+
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .player {
-  height: 200px;
-  width: 200px;
+  width: var(--default-size);
+  height: var(--default-size);
 }
 
 #canvas {
   display: none;
+}
+
+#start {
+  background-color: pink;
+}
+
+#snap {
+  background-color: yellow;
+}
+
+.button {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  width: var(--default-size);
+  height: var(--default-size);
+}
+
+.hidden {
+  visibility: hidden;
+}
+.visible {
+  visibility: visible;
+}
+
+#instructions {
+  font-size: 5rem;
 }
